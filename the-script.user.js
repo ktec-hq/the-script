@@ -1,12 +1,4 @@
 // ==UserScript==
-// @name        THE Script
-// @namespace   https://github.com/kairyu/
-// @description TKG Helper Extension Script
-// @include     http://www.keyboard-layout-editor.com/
-// @version     1
-// @grant       none
-// ==/UserScript==
-// ==UserScript==
 // @name         TKG Helper Extension Script
 // @namespace    https://github.com/kairyu/the-script
 // @version      0.1

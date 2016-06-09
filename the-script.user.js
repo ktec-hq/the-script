@@ -10,18 +10,22 @@
 
 (function() {
     'use strict';
-    angularInjector("selectRelease", null, function() {
+    var zNode       = document.createElement ('div');
+    zNode.innerHTML = '<button id="myButton" type="button">' + 'Test</button>';
+    zNode.setAttribute ('id', 'myContainer');
+    document.body.appendChild (zNode);
+    document.getElementById ("myButton").addEventListener ("click", ButtonClickAction, false);
+
+    function ButtonClickAction (zEvent) {
         var selectedKeys = getSelectedKeys();
-        if(selectedKeys.length > 1 || selectedKeys.length === 0) {
-            console.log("THE only works when you select one key instead of multiple keys or no key");
-        }
-        else {
-            var keyLabels = new Array(12);
-            keyLabels[0] = "shit";
-            keyLabels[6] = "Holy Shit";
-            setKeyLabels(keyLabels);
-            updateKeyLabels();
-        }
+        var keyLabels = new Array(12);
+        keyLabels[0] = "shit";
+        keyLabels[6] = "Holy Shit";
+        setKeyLabels(keyLabels);
+        updateKeyLabels();
+    }
+    angularInjector("selectRelease", null, function() {
+
     });
 })();
 
@@ -66,18 +70,20 @@ function getSelectedKeys() {
 }
 
 /*
-  Set the keylabels of the last key in selectedKeys
+  Set the keylabels of keys in selectedKeys
 */
 
 function setKeyLabels(keyLabels) {
-    getSelectedKeys().last().labels = keyLabels;
+    getSelectedKeys().forEach(function(selectedKey) {
+        selectedKey.labels = keyLabels;
+    });
 }
 
 /*
-  Update keylabels of the last key in selectedKeys
+  Update keylabels of keys in selectedKeys
 */
 
 function updateKeyLabels() {
-    getAngularScope().multi = getSelectedKeys().last();
-    getAngularScope().updateMulti('labels');
+     getAngularScope().multi = getSelectedKeys()[0];
+     getAngularScope().updateMulti('labels');
 }

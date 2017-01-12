@@ -11,7 +11,7 @@
     // @grant        GM_getResourceText
     // @grant        GM_setClipboard
     // @grant        GM_xmlhttpRequest
-    // @connect      https://tkg.io
+    // @connect      tkg.io
     // @resource     list https://tkg.io/keyboard/list.json
     // ==/UserScript==
 

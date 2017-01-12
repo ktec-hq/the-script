@@ -117,7 +117,7 @@
     function init() {
         //Add Copy to clipboard function
         var clipboardButton = $('<div class="btn-group pull-right" style="margin-right: 4px;"><button type="button" class="btn btn-success" id="clipboard-button"><i class="fa fa-clipboard"></i> Copy to Clipboard</button></div>');
-        clipboardButton.insertAfter($('div.btn-group.pull-right')[0]);
+        clipboardButton.insertAfter($('div.btn-group.pull-right').last());
         $('button#clipboard-button').bind('click', function() {
             GM_setClipboard(getAngularScope().serialized);
         });

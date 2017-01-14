@@ -51,7 +51,7 @@
                             var keyLabels = new Array(12);
                             keyLabels[i] = '';
                             setKeyLabels(keyLabels);
-                        };
+                        }
                         return;
                     }
                     else return;
@@ -71,7 +71,6 @@
 
                 var selectedKeys = getSelectedKeys();
                 //判断是否只选择了一个按键
-                //console.log(selectedKeys[0].default.textSize);
                 if(selectedKeys.length === 1) {
                     var keyLabels = new Array(12);
                     if (selectedKeys[0].profile.indexOf("SA") > -1 ) {  //profile = SA DSA NDSA
@@ -97,26 +96,17 @@
             }
         });
 
-        function btnClickAction (zEvent) {
-            var code = parseInt($(zEvent).attr('id').match(/ck-((0x){0,1}[0-9a-fA-F]+)/)[1]);
-            console.log(code);
-            var selectedKeys = getSelectedKeys();
-            var keyLabels = new Array(12);
-            keyLabels[0] = label[code].top;
-            keyLabels[6] = label[code].bottom;
-            setKeyLabels(keyLabels);
-        }
-
     })();
 
-    /* Add THE Panel*/
+    /* Add THE functions*/
     function init() {
+        //alert('本插件只能配合tkg.io网站使用');
+        injectTheCss();
         //Add Copy to clipboard function
         var clipboardButton = $('<div class="btn-group pull-right" style="margin-right: 4px;"><button type="button" class="btn btn-success" id="clipboard-button"><i class="fa fa-clipboard"></i> Copy to Clipboard</button></div>');
         clipboardButton.insertAfter($('div.btn-group.pull-right').last());
         $('button#clipboard-button').bind('click', function() {
             GM_setClipboard(getAngularScope().serialized);
-
         });
         //add nav-tab
         var navTab = $('.nav.nav-tabs');  //find the bottom nav-tab
@@ -130,6 +120,26 @@
         injectKtecPresets();
     }
 
+    function injectGlobalCss(css) {
+        var head, style;
+        head = document.getElementsByTagName('head')[0];
+        if (!head) { return; }
+        style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = css;
+        head.appendChild(style);
+    }
+
+    function injectTheCss() {
+        var dropdownSubmenu = `.dropdown-submenu{position:relative;}
+.dropdown-submenu>.dropdown-menu{top:0;left:100%;margin-top:-6px;margin-left:-1px;-webkit-border-radius:0 6px 6px 6px;-moz-border-radius:0 6px 6px 6px;border-radius:0 6px 6px 6px;}
+.dropdown-submenu:hover>.dropdown-menu{display:block;}
+.dropdown-submenu>a:after{display:block;content:" ";float:right;width:0;height:0;border-color:transparent;border-style:solid;border-width:5px 0 5px 5px;border-left-color:#cccccc;margin-top:5px;margin-right:-10px;}
+.dropdown-submenu:hover>a:after{border-left-color:#ffffff;}
+.dropdown-submenu.pull-left{float:none;}.dropdown-submenu.pull-left>.dropdown-menu{left:-100%;margin-left:10px;-webkit-border-radius:6px 0 6px 6px;-moz-border-radius:6px 0 6px 6px;border-radius:6px 0 6px 6px;}`;
+        injectGlobalCss(dropdownSubmenu);
+    }
+
     function injectKtecPresets() {
         var menu = $($('ul.nav.navbar-nav')[0]);
         var template = '<li class="dropdown" dropdown=""><a class="dropdown-toggle" dropdown-toggle="" aria-haspopup="true" aria-expanded="false"><i class="fa fa-wheelchair"></i> TKG Preset <b class="caret"></b></a><ul class="dropdown-menu" id="tkg-preset"></li>';
@@ -137,11 +147,11 @@
         var tkgDropdown = $('ul#tkg-preset');
         var labels = '<li class="dropdown-header" id="first-party">First Party</li><li class="divider"></li><li class="dropdown-header" id="second-party">Second Party</li><li class="divider"></li><li class="dropdown-header" id="third-party">Third Party</li>';
         tkgDropdown.prepend(labels);
-        var kimeraMenu = '<>';
+        var kimeraMenu = '<li class="dropdown-submenu"><a>Kimera Presets</a><ul class="dropdown-menu" id="kimera-presets"></ul></li>';
+        $(kimeraMenu).insertAfter($('li.dropdown-header#first-party'));
         var keyboardList = GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://tkg.io/keyboard/list.json', onload : function (response) {
             if(response.status == 200) {
                 var keyboardList = JSON.parse(response.responseText);
-                console.log(keyboardList);
                 addTkgPreset(keyboardList);
             } else {
                 console.log("Unable to get keyboard list");
@@ -152,8 +162,7 @@
 
     function parseKeyboardName(name) {
         var result = name.match(/^(.*)\((.*)\)$/);
-        var main;
-        var variant;
+        var main, variant;
         if (result) {
             main = normalizeString(result[1]);
             variant = normalizeString(result[2]);
@@ -177,6 +186,7 @@
             var keyboardId = this.name.replace(/[\s\/\(\)\+]/g, '-');
             requestKeyboardConfig(keyboardName, keyboardId, keyboardGroup);
         });
+        requestKimeraPresets();
     }
 
     /* request config file */
@@ -187,7 +197,7 @@
             if(response.status == 200) {
                 var config = JSON.parse(response.responseText);
                 if(config.default_layers !== undefined) {
-                    keyboardDefaultLayers[keyboardId] = config.default_layers;
+                    keyboardDefaultLayers[keyboardId] = {"default_layers": config.default_layers, "default_layer_mode": config.default_layer_mode};
                     var template = '<li>' +'<a id="' + keyboardId + '">' + keyboardName + '</a>'+ '</li>';
                     $(template).insertAfter($('li#' + keyboardGroup));
                     $('a#' + keyboardId).bind('click', updatePreset);
@@ -199,17 +209,41 @@
                 if(response.status == 200) {
                     var config = JSON.parse(response.responseText);
                     if(config.default_layers !== undefined) {
-                        keyboardDefaultLayers[keyboardId] = config.default_layers;
+                        keyboardDefaultLayers[keyboardId].default_layers =  config.default_layers;
+                    }
+                    if(config.default_layer_mode !== undefined) {
+                        keyboardDefaultLayers[keyboardId].default_layer_mode =  config.default_layer_mode;
                     }
                 }
             }});
         }
     }
 
+    /*request kimera presets from https://kai.tkg.io/keyboard/config/kimera-config.json */
+    function requestKimeraPresets() {
+        GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://kai.tkg.io/keyboard/config/kimera-config.json', onload : function (response) {
+            if(response.status == 200) {
+                var presets = JSON.parse(response.responseText).presets;
+                presets.forEach(function(preset) {
+                    var keyboardName = preset.name;
+                    var keyboardId = preset.name.replace(/[\s\/\(\)\+]/g, '-');
+                    var template = '<li>' +'<a id="' + keyboardId + '">' + keyboardName + '</a>'+ '</li>';
+                    keyboardDefaultLayers[keyboardId] = {"default_layers": preset.default_layers, "matrix_map_raw": preset.matrix_map_raw};
+                    $('ul#kimera-presets').append(template);
+                    $('a#' + keyboardId).bind('click', updatePreset);
+                });
+            }
+        }});
+    }
+
     /*update preset*/
     function updatePreset(o) {
-        getAngularScope().serialized = keyboardDefaultLayers[o.currentTarget.id];
-        getAngularScope().updateFromSerialized();
+        if(keyboardDefaultLayers[o.currentTarget.id].default_layers) {
+            getAngularScope().serialized = keyboardDefaultLayers[o.currentTarget.id].default_layers;
+            getAngularScope().updateFromSerialized();
+        } else {
+            alert('Mother Fucker');
+        }
     }
     /*
     compile the new content in order to link with current scope
@@ -377,4 +411,5 @@
         222 : {'top':'"','bottom':'\''}
     };
     var keyboardDefaultLayers = {};
+
 })();

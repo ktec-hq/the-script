@@ -147,7 +147,7 @@
         var tkgDropdown = $('ul#tkg-preset');
         var labels = '<li class="dropdown-header" id="first-party">First Party</li><li class="divider"></li><li class="dropdown-header" id="second-party">Second Party</li><li class="divider"></li><li class="dropdown-header" id="third-party">Third Party</li>';
         tkgDropdown.prepend(labels);
-        var kimeraMenu = '<li class="dropdown-submenu"><a>Kimera Presets</a><ul class="dropdown-menu" id="kimera-presets"></ul></li>';
+        var kimeraMenu = '<li class="dropdown-submenu"><a>Kimera</a><ul class="dropdown-menu" id="kimera-presets"><li class="dropdown-header" id="kimera-matrix">Matrix</li><li class="divider"></li><li class="dropdown-header" id="kimera-layout">Layout</li></ul></li>';
         $(kimeraMenu).insertAfter($('li.dropdown-header#first-party'));
         var keyboardList = GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://tkg.io/keyboard/list.json?' + Math.random().toString(36).slice(2), onload : function (response) {
             if(response.status == 200) {
@@ -223,14 +223,20 @@
     function requestKimeraPresets() {
         GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://kai.tkg.io/keyboard/config/kimera-config.json?' + Math.random().toString(36).slice(2), onload : function (response) {
             if(response.status == 200) {
-                var presets = JSON.parse(response.responseText).presets;
+                var presets = JSON.parse(response.responseText).presets.reverse();
                 presets.forEach(function(preset) {
                     var keyboardName = preset.name;
                     var keyboardId = preset.name.replace(/[\s\/\(\)\+]/g, '-');
-                    var template = '<li>' +'<a id="' + keyboardId + '">' + keyboardName + '</a>'+ '</li>';
-                    keyboardDefaultLayers[keyboardId] = {"default_layers": preset.default_layers, "matrix_map_raw": preset.matrix_map_raw};
-                    $('ul#kimera-presets').append(template);
-                    $('a#' + keyboardId).bind('click', updatePreset);
+                    var keyboardIdMatrix = keyboardId + '-matrix';
+                    var keyboardIdLayout = keyboardId + '-layout';
+                    var template = '<li>' +'<a id="' + keyboardIdMatrix + '">' + keyboardName + '</a>'+ '</li>';
+                    $(template).insertAfter($('ul#kimera-presets li#kimera-matrix'));
+                    template = '<li>' +'<a id="' + keyboardIdLayout + '">' + keyboardName + '</a>'+ '</li>';
+                    $(template).insertAfter($('ul#kimera-presets li#kimera-layout'));
+                    keyboardDefaultLayers[keyboardIdMatrix] = {"default_layers": preset.matrix_map_raw,};
+                    keyboardDefaultLayers[keyboardIdLayout] = {"default_layers": preset.default_layers};
+                    $('a#' + keyboardIdMatrix).bind('click', updatePreset);
+                    $('a#' + keyboardIdLayout).bind('click', updatePreset);
                 });
             }
         }});

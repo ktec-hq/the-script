@@ -149,7 +149,7 @@
         tkgDropdown.prepend(labels);
         var kimeraMenu = '<li class="dropdown-submenu"><a>Kimera Presets</a><ul class="dropdown-menu" id="kimera-presets"></ul></li>';
         $(kimeraMenu).insertAfter($('li.dropdown-header#first-party'));
-        var keyboardList = GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://tkg.io/keyboard/list.json', onload : function (response) {
+        var keyboardList = GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://tkg.io/keyboard/list.json?' + Math.random().toString(36).slice(2), onload : function (response) {
             if(response.status == 200) {
                 var keyboardList = JSON.parse(response.responseText);
                 addTkgPreset(keyboardList);
@@ -193,7 +193,7 @@
     function requestKeyboardConfig(keyboardName, keyboardId, keyboardGroup){
         var main = parseKeyboardName(keyboardName).main;
         var variant = parseKeyboardName(keyboardName).variant;
-        GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://kai.tkg.io/keyboard/config/' + main +'.json', onload : function (response) {
+        GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://kai.tkg.io/keyboard/config/' + main +'.json?' + Math.random().toString(36).slice(2), onload : function (response) {
             if(response.status == 200) {
                 var config = JSON.parse(response.responseText);
                 if(config.default_layers !== undefined) {
@@ -205,7 +205,7 @@
             }
         }});
         if(variant !== undefined) {
-            GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://kai.tkg.io/keyboard/config/' + main +'.json', onload : function (response) {
+            GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://kai.tkg.io/keyboard/config/' + main +'.json?' + Math.random().toString(36).slice(2), onload : function (response) {
                 if(response.status == 200) {
                     var config = JSON.parse(response.responseText);
                     if(config.default_layers !== undefined) {
@@ -221,7 +221,7 @@
 
     /*request kimera presets from https://kai.tkg.io/keyboard/config/kimera-config.json */
     function requestKimeraPresets() {
-        GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://kai.tkg.io/keyboard/config/kimera-config.json', onload : function (response) {
+        GM_xmlhttpRequest({ method : "GET", headers: {"Accept": "application/json"}, url : 'https://kai.tkg.io/keyboard/config/kimera-config.json?' + Math.random().toString(36).slice(2), onload : function (response) {
             if(response.status == 200) {
                 var presets = JSON.parse(response.responseText).presets;
                 presets.forEach(function(preset) {

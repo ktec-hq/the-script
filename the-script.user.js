@@ -3,10 +3,10 @@
 
     // ==UserScript==
     // @name         TKG Helper Extension Script
-    // @namespace    https://github.com/kairyu/the-script
+    // @namespace    https://github.com/ktec-hq/the-script
     // @version      1.0
     // @description  TKG Helper Extension Script
-    // @author       KaiRyu & Hging & Chen Yang & yangdigi
+    // @author       Kai Ryu & Hging & Chen Yang & yangdigi
     // @match        http://www.keyboard-layout-editor.com/*
     // @grant        GM_getResourceText
     // @grant        GM_setClipboard
